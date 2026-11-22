@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Comedor Universitario UNMSM – Reserva en línea</title>
+<style>
+:root{--bg:#f6f4ef;--card:#fff;--tx:#1d1d1b;--mut:#6a675f;--pri:#8c1c1c;--pri-tx:#fff;--ok:#2a7a3b;--warn:#b7791f;--bad:#b42318;--bd:#e3dfd5;--soft:#f1ece0}
+@media (prefers-color-scheme:dark){:root{--bg:#151413;--card:#201f1d;--tx:#f1eee7;--mut:#a9a597;--pri:#d65a5a;--pri-tx:#1a0d0d;--ok:#5cc274;--warn:#e0a94a;--bad:#f2766b;--bd:#37352f;--soft:#2a2824;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{background:var(--pri);color:var(--pri-tx);padding:22px 16px}
+.w{max-width:880px;margin:0 auto;padding:0 16px}
+header .w{padding:0}
+h1{margin:0;font-size:1.5rem}header p{margin:4px 0 0;opacity:.9}
+main{padding:20px 0 40px}
+section{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:18px;margin-bottom:16px}
+h2{margin:0 0 12px;font-size:1.15rem}
+.live{float:right;font-size:.8rem;color:var(--mut);font-weight:400}
+.live i{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--warn);margin-right:5px}
+.live.on i{background:var(--ok)}.live.off i{background:var(--bad)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.tab{border:1px solid var(--bd);background:var(--soft);color:var(--tx);padding:8px 14px;border-radius:999px;cursor:pointer;font:inherit}
+.tab[aria-pressed="true"]{background:var(--pri);color:var(--pri-tx);border-color:var(--pri)}
+.menu{background:var(--soft);border-radius:10px;padding:12px 14px;margin-bottom:14px}
+.menu b{display:block;margin-bottom:2px}
+.turnos{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+.t{border:2px solid var(--bd);border-radius:12px;padding:12px;background:var(--card);color:var(--tx);text-align:left;cursor:pointer;font:inherit}
+.t[aria-pressed="true"]{border-color:var(--pri)}
+.t:disabled{opacity:.55;cursor:not-allowed}
+.t .h{font-size:1.25rem;font-weight:700}
+.bar{height:8px;background:var(--bd);border-radius:6px;overflow:hidden;margin:8px 0 4px}
+.bar i{display:block;height:100%;transition:width .4s}
+.n{font-size:.85rem;color:var(--mut)}
+label{display:block;font-weight:600;margin:10px 0 4px}
+input{width:100%;padding:10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font:inherit}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:560px){.row{grid-template-columns:1fr}}
+.btn{margin-top:14px;background:var(--pri);color:var(--pri-tx);border:0;border-radius:10px;padding:12px 18px;font:inherit;font-weight:700;cursor:pointer}
+.btn:disabled{opacity:.6}
+.btn.sec{background:var(--soft);color:var(--tx);border:1px solid var(--bd)}
+.msg{margin-top:10px;font-size:.95rem}.err{color:var(--bad)}.okc{color:var(--ok)}
+.ticket{border:2px dashed var(--pri);border-radius:12px;padding:16px;text-align:center}
+.ticket .c{font-size:2rem;font-weight:800;letter-spacing:.08em;color:var(--pri)}
+ul{margin:0;padding-left:20px}li{margin:4px 0}
+footer{text-align:center;color:var(--mut);font-size:.85rem;padding:0 16px 24px}
+</style>
+</head>
+<body>
+<header><div class="w"><h1>🍽️ Comedor Universitario – UNMSM</h1><p>Reserva tu ración en línea y evita las colas.</p></div></header>
+<main class="w">
+
+<section>
+<h2>1. Elige el servicio y tu turno <span class="live" id="live"><i></i><span id="livet">Conectando…</span></span></h2>
+<div class="tabs" id="tabs"></div>
+<div class="menu" id="menu"></div>
+<div class="turnos" id="turnos"><span class="n">Cargando turnos…</span></div>
+</section>
+
+<section>
+<h2>2. ¿A qué hora sales de clase?</h2>
+<p class="n" style="margin-top:0">Te sugerimos el primer turno con cupos que te deja llegar sin faltar a clase.</p>
+<div class="row"><div><label for="salida">Hora de salida</label><input type="time" id="salida" value="12:00"></div>
+<div style="display:flex;align-items:flex-end"><button class="btn sec" id="sug" style="margin:0;width:100%">Sugerir turno</button></div></div>
+<div class="msg" id="sugmsg"></div>
+</section>
+
+<section>
+<h2>3. Confirma tu reserva</h2>
+<div class="row"><div><label for="cod">Código de matrícula (8 dígitos)</label><input id="cod" inputmode="numeric" maxlength="8" placeholder="Ej. 20201234"></div>
+<div><label for="nom">Nombre completo</label><input id="nom" placeholder="Tu nombre"></div></div>
+<button class="btn" id="res">Reservar ración</button>
+<div class="msg" id="resmsg"></div>
+</section>
+
+<section id="mi" hidden>
+<h2>Tu reserva</h2>
+<div class="ticket" id="ticket"></div>
+<button class="btn sec" id="cancel">Cancelar reserva</button>
+</section>
+
+<section>
+<h2>Reglas para evitar colas y retrasos</h2>
+<ul>
+<li>Llega <b>10 minutos antes</b> de tu turno con tu carné universitario y el código de reserva.</li>
+<li>Si no llegas a los <b>10 minutos</b> de iniciado tu turno, la ración se libera para otro estudiante.</li>
+<li>Puedes cancelar hasta <b>30 minutos antes</b> para que otro compañero use tu cupo.</li>
+<li>Se permite <b>una reserva por servicio</b> y por estudiante.</li>
+<li>Elige un turno que no choque con tus clases: usa el sugeridor de horario.</li>
+</ul>
+</section>
+</main>
+<footer>Proyecto académico · Los cupos se actualizan en tiempo real para todos los usuarios.</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.58.0/dist/umd/supabase.js"></script>
+<script>
+const SUPABASE_URL='https://oefboaaaqjqrotrloxyf.supabase.co';
+const SUPABASE_KEY='sb_publishable_lY9fNxr84g_Fn06xRNKS5g_ZbXpE6VB';
+const MENU={desayuno:['☕ Desayuno','Pan con huevo o queso, avena caliente y fruta.'],almuerzo:['🍛 Almuerzo','Sopa de verduras, arroz con pollo y ensalada, refresco y fruta.']};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const mins=h=>{const[a,b]=h.split(':').map(Number);return a*60+b};
+let db=null,turnos=[],cur='almuerzo',sel=null,mine=null;
+try{mine=JSON.parse(localStorage.getItem('rsv')||'null')}catch(e){}
+function saveMine(){try{mine?localStorage.setItem('rsv',JSON.stringify(mine)):localStorage.removeItem('rsv')}catch(e){}}
+function status(c,t){$('live').className='live '+c;$('livet').textContent=t}
+
+async function load(){
+  try{
+    const{data,error}=await db.from('turnos').select('*').order('hora');
+    if(error)throw error;
+    turnos=data;status('on','En vivo');render();
+  }catch(e){status('off','Sin conexión');console.error(e)}
+}
+function render(){
+  $('tabs').innerHTML=Object.keys(MENU).map(k=>`<button class="tab" data-s="${k}" aria-pressed="${k===cur}">${MENU[k][0]}</button>`).join('');
+  $('menu').innerHTML=`<b>Menú de hoy</b>${MENU[cur][1]}`;
+  const list=turnos.filter(t=>t.servicio===cur);
+  if(sel&&!list.some(t=>t.hora===sel&&t.disponibles>0))sel=null;
+  $('turnos').innerHTML=list.length?list.map(t=>{
+    const p=t.disponibles/t.capacidad,col=t.disponibles===0?'var(--bad)':p<.2?'var(--warn)':'var(--ok)';
+    return `<button class="t" data-h="${t.hora}" ${t.disponibles===0?'disabled':''} aria-pressed="${sel===t.hora}"><div class="h">${t.hora}</div><div class="bar"><i style="width:${Math.max(3,p*100)}%;background:${col}"></i></div><div class="n">${t.disponibles===0?'Agotado':t.disponibles+' de '+t.capacidad+' disponibles'}</div></button>`}).join(''):'<span class="n">No hay turnos.</span>';
+  $('mi').hidden=!mine;
+  if(mine)$('ticket').innerHTML=`<div class="n">${MENU[mine.s][0]} · ${mine.h}</div><div class="c">${esc(mine.k)}</div><div>${esc(mine.nom)} · ${esc(mine.cod)}</div><div class="n">Llega 10 min antes con tu carné.</div>`;
+}
+document.addEventListener('click',e=>{
+  const a=e.target.closest('.tab');if(a){cur=a.dataset.s;sel=null;render()}
+  const b=e.target.closest('.t');if(b&&!b.disabled){sel=b.dataset.h;render()}
+});
+$('sug').onclick=()=>{
+  const v=$('salida').value;if(!v){$('sugmsg').textContent='Indica tu hora de salida.';return}
+  const lim=mins(v)+15;let f=null;
+  for(const k of ['almuerzo','desayuno']){f=turnos.find(t=>t.servicio===k&&mins(t.hora)>=lim&&t.disponibles>0);if(f)break}
+  $('sugmsg').className='msg '+(f?'okc':'err');
+  if(f){cur=f.servicio;sel=f.hora;render();$('sugmsg').textContent=`Te recomendamos el turno de ${f.hora} (${MENU[f.servicio][0].slice(2)}): quedan ${f.disponibles} cupos. Ya lo seleccionamos para ti.`}
+  else $('sugmsg').textContent='No hay turnos disponibles después de esa hora.';
+};
+$('res').onclick=async()=>{
+  const m=$('resmsg'),cod=$('cod').value.trim(),nom=$('nom').value.trim();m.className='msg err';
+  if(mine){m.textContent='Ya tienes una reserva activa. Cancélala para hacer otra.';return}
+  if(!sel){m.textContent='Elige primero un turno.';return}
+  if(!/^\d{8}$/.test(cod)){m.textContent='El código de matrícula debe tener 8 dígitos.';return}
+  if(nom.length<3){m.textContent='Escribe tu nombre completo.';return}
+  const btn=$('res');btn.disabled=true;m.className='msg';m.textContent='Reservando…';
+  const{data,error}=await db.rpc('reservar',{p_servicio:cur,p_hora:sel,p_matricula:cod,p_nombre:nom});
+  btn.disabled=false;
+  if(error){m.className='msg err';m.textContent=error.message;load();return}
+  mine={s:cur,h:sel,cod,nom,k:data};saveMine();
+  m.className='msg okc';m.textContent='¡Reserva confirmada! Guarda tu código.';sel=null;load();
+};
+$('cancel').onclick=async()=>{
+  const{error}=await db.rpc('cancelar',{p_codigo:mine.k});
+  if(error){$('resmsg').className='msg err';$('resmsg').textContent=error.message;return}
+  mine=null;saveMine();
+  $('resmsg').className='msg';$('resmsg').textContent='Reserva cancelada. El cupo quedó libre para otro estudiante.';load();
+};
+try{
+  db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+  load();
+  db.channel('turnos-vivo').on('postgres_changes',{event:'*',schema:'public',table:'turnos'},load).subscribe();
+  setInterval(load,10000);
+}catch(e){status('off','Error de conexión');console.error(e)}
+</script>
+</body>
+</html>
