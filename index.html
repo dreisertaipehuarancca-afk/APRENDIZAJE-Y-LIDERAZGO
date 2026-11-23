@@ -13,6 +13,9 @@ header{background:var(--pri);color:var(--pri-tx);padding:22px 16px}
 .w{max-width:880px;margin:0 auto;padding:0 16px}
 header .w{padding:0}
 h1{margin:0;font-size:1.5rem}header p{margin:4px 0 0;opacity:.9}
+.dif{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:14px}
+.dif div{background:rgba(255,255,255,.12);border-radius:10px;padding:10px 12px;font-size:.9rem}
+.dif b{display:block}
 main{padding:20px 0 40px}
 section{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:18px;margin-bottom:16px}
 h2{margin:0 0 12px;font-size:1.15rem}
@@ -27,7 +30,7 @@ h2{margin:0 0 12px;font-size:1.15rem}
 .turnos{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
 .t{border:2px solid var(--bd);border-radius:12px;padding:12px;background:var(--card);color:var(--tx);text-align:left;cursor:pointer;font:inherit}
 .t[aria-pressed="true"]{border-color:var(--pri)}
-.t:disabled{opacity:.55;cursor:not-allowed}
+.t.full{background:var(--soft)}
 .t .h{font-size:1.25rem;font-weight:700}
 .bar{height:8px;background:var(--bd);border-radius:6px;overflow:hidden;margin:8px 0 4px}
 .bar i{display:block;height:100%;transition:width .4s}
@@ -35,19 +38,40 @@ h2{margin:0 0 12px;font-size:1.15rem}
 label{display:block;font-weight:600;margin:10px 0 4px}
 input{width:100%;padding:10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font:inherit}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media(max-width:560px){.row{grid-template-columns:1fr}}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+@media(max-width:560px){.row,.row3{grid-template-columns:1fr}}
 .btn{margin-top:14px;background:var(--pri);color:var(--pri-tx);border:0;border-radius:10px;padding:12px 18px;font:inherit;font-weight:700;cursor:pointer}
 .btn:disabled{opacity:.6}
 .btn.sec{background:var(--soft);color:var(--tx);border:1px solid var(--bd)}
+.opts{display:flex;gap:8px;flex-wrap:wrap}
 .msg{margin-top:10px;font-size:.95rem}.err{color:var(--bad)}.okc{color:var(--ok)}
 .ticket{border:2px dashed var(--pri);border-radius:12px;padding:16px;text-align:center}
 .ticket .c{font-size:2rem;font-weight:800;letter-spacing:.08em;color:var(--pri)}
+.qr{display:inline-block;background:#fff;padding:8px;border-radius:8px;margin:8px 0}
+.qr svg{display:block;width:160px;height:160px}
+.wait{border:2px solid var(--warn);border-radius:12px;padding:16px;text-align:center}
+.wait .p{font-size:2.4rem;font-weight:800;color:var(--warn)}
+table{width:100%;border-collapse:collapse;font-size:.92rem}
+th,td{padding:7px 6px;border-bottom:1px solid var(--bd);text-align:right}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--mut);font-weight:600}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px}
+.kpi{background:var(--soft);border-radius:10px;padding:10px 12px}
+.kpi b{display:block;font-size:1.5rem}
 ul{margin:0;padding-left:20px}li{margin:4px 0}
 footer{text-align:center;color:var(--mut);font-size:.85rem;padding:0 16px 24px}
 </style>
 </head>
 <body>
-<header><div class="w"><h1>🍽️ Comedor Universitario – UNMSM</h1><p>Reserva tu ración en línea y evita las colas.</p></div></header>
+<header><div class="w">
+<h1>🍽️ Comedor Universitario – UNMSM</h1>
+<p>Reserva tu ración sin competir por el ticket ni hacer cola.</p>
+<div class="dif">
+<div><b>🕐 Según tu horario de clases</b>Te sugerimos el turno que no choca con tus clases.</div>
+<div><b>🔁 Lista de espera automática</b>Si alguien cancela, su ración pasa a ti sola.</div>
+<div><b>📊 Cupos en vivo</b>Sabes si alcanzas antes de salir de casa.</div>
+</div>
+</div></header>
 <main class="w">
 
 <section>
@@ -58,17 +82,25 @@ footer{text-align:center;color:var(--mut);font-size:.85rem;padding:0 16px 24px}
 </section>
 
 <section>
-<h2>2. ¿A qué hora sales de clase?</h2>
-<p class="n" style="margin-top:0">Te sugerimos el primer turno con cupos que te deja llegar sin faltar a clase.</p>
-<div class="row"><div><label for="salida">Hora de salida</label><input type="time" id="salida" value="12:00"></div>
-<div style="display:flex;align-items:flex-end"><button class="btn sec" id="sug" style="margin:0;width:100%">Sugerir turno</button></div></div>
+<h2>2. Turno según tu horario de clases</h2>
+<p class="n" style="margin-top:0">Dinos cuándo sales y cuándo vuelves a clase. Buscamos un turno con cupo que te deje comer sin faltar ni llegar tarde.</p>
+<div class="row3">
+<div><label for="salida">Salgo de clase a las</label><input type="time" id="salida" value="12:00"></div>
+<div><label for="vuelta">Vuelvo a clase a las</label><input type="time" id="vuelta" value="14:00"></div>
+<div style="display:flex;align-items:flex-end"><button class="btn sec" id="sug" style="margin:0;width:100%">Sugerir turno</button></div>
+</div>
 <div class="msg" id="sugmsg"></div>
 </section>
 
-<section>
+<section id="confirmar">
 <h2>3. Confirma tu reserva</h2>
 <div class="row"><div><label for="cod">Código de matrícula (8 dígitos)</label><input id="cod" inputmode="numeric" maxlength="8" placeholder="Ej. 20201234"></div>
 <div><label for="nom">Nombre completo</label><input id="nom" placeholder="Tu nombre"></div></div>
+<label>Tipo de menú</label>
+<div class="opts" id="menus">
+<button class="tab" data-m="normal" aria-pressed="true">Menú regular</button>
+<button class="tab" data-m="vegano" aria-pressed="false">🌱 Menú vegano</button>
+</div>
 <button class="btn" id="res">Reservar ración</button>
 <div class="msg" id="resmsg"></div>
 </section>
@@ -76,83 +108,142 @@ footer{text-align:center;color:var(--mut);font-size:.85rem;padding:0 16px 24px}
 <section id="mi" hidden>
 <h2>Tu reserva</h2>
 <div class="ticket" id="ticket"></div>
-<button class="btn sec" id="cancel">Cancelar reserva</button>
+<button class="btn sec" id="cancel">No podré ir: liberar mi ración</button>
+</section>
+
+<section id="espera" hidden>
+<h2>Tu lista de espera</h2>
+<div class="wait" id="waitbox"></div>
+<button class="btn sec" id="salir">Salir de la lista de espera</button>
 </section>
 
 <section>
 <h2>Reglas para evitar colas y retrasos</h2>
 <ul>
-<li>Llega <b>10 minutos antes</b> de tu turno con tu carné universitario y el código de reserva.</li>
+<li>Las reservas para el día siguiente abren desde la <b>noche anterior</b>: nadie compite por un ticket a la hora del servicio.</li>
+<li>Llega a tu turno con tu carné y muestra el <b>código QR</b> de tu reserva.</li>
+<li>Si no puedes ir, <b>libera tu ración</b>: pasa automáticamente al primero de la lista de espera.</li>
 <li>Si no llegas a los <b>10 minutos</b> de iniciado tu turno, la ración se libera para otro estudiante.</li>
-<li>Puedes cancelar hasta <b>30 minutos antes</b> para que otro compañero use tu cupo.</li>
-<li>Se permite <b>una reserva por servicio</b> y por estudiante.</li>
-<li>Elige un turno que no choque con tus clases: usa el sugeridor de horario.</li>
+<li>Se permite <b>una reserva o una lista de espera por servicio</b> y por estudiante.</li>
 </ul>
 </section>
+
+<section>
+<h2>📊 Datos para Bienestar Universitario <span class="live" style="float:none;margin-left:6px">se actualiza solo</span></h2>
+<p class="n" style="margin-top:0">Resumen anónimo de la demanda. Sirve para planificar raciones y sustentar un pedido de más cupos.</p>
+<div class="kpis" id="kpis"></div>
+<div style="overflow-x:auto"><table id="tabla"><thead><tr><th>Turno</th><th>Reservadas</th><th>Capacidad</th><th>En espera</th><th>Veganos</th></tr></thead><tbody></tbody></table></div>
+</section>
 </main>
-<footer>Proyecto académico · Los cupos se actualizan en tiempo real para todos los usuarios.</footer>
+<footer>Proyecto académico · Grupo 1 · Aprendizaje Estratégico y Liderazgo · Los cupos se actualizan en tiempo real.</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.58.0/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <script>
 const SUPABASE_URL='https://oefboaaaqjqrotrloxyf.supabase.co';
 const SUPABASE_KEY='sb_publishable_lY9fNxr84g_Fn06xRNKS5g_ZbXpE6VB';
-const MENU={desayuno:['☕ Desayuno','Pan con huevo o queso, avena caliente y fruta.'],almuerzo:['🍛 Almuerzo','Sopa de verduras, arroz con pollo y ensalada, refresco y fruta.']};
+const MENU={desayuno:['☕ Desayuno','Pan con huevo o queso, avena caliente y fruta.','Pan con palta, avena con leche vegetal y fruta.'],almuerzo:['🍛 Almuerzo','Sopa de verduras, arroz con pollo y ensalada, refresco y fruta.','Sopa de verduras, guiso de lentejas con arroz, refresco y fruta.']};
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const mins=h=>{const[a,b]=h.split(':').map(Number);return a*60+b};
-let db=null,turnos=[],cur='almuerzo',sel=null,mine=null;
-try{mine=JSON.parse(localStorage.getItem('rsv')||'null')}catch(e){}
-function saveMine(){try{mine?localStorage.setItem('rsv',JSON.stringify(mine)):localStorage.removeItem('rsv')}catch(e){}}
+const fmt=m=>String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
+let db=null,turnos=[],resu=[],cur='almuerzo',sel=null,menuSel='normal',mine=null,wait=null;
+try{mine=JSON.parse(localStorage.getItem('rsv')||'null');wait=JSON.parse(localStorage.getItem('wait')||'null')}catch(e){}
+function save(){try{mine?localStorage.setItem('rsv',JSON.stringify(mine)):localStorage.removeItem('rsv');wait?localStorage.setItem('wait',JSON.stringify(wait)):localStorage.removeItem('wait')}catch(e){}}
 function status(c,t){$('live').className='live '+c;$('livet').textContent=t}
+const espera=(s,h)=>{const r=resu.find(x=>x.servicio===s&&x.hora===h);return r?Number(r.en_espera):0};
 
 async function load(){
   try{
-    const{data,error}=await db.from('turnos').select('*').order('hora');
+    const[{data,error},r]=await Promise.all([db.from('turnos').select('*').order('hora'),db.rpc('resumen')]);
     if(error)throw error;
-    turnos=data;status('on','En vivo');render();
+    turnos=data;if(!r.error)resu=r.data||[];
+    status('on','En vivo');render();
   }catch(e){status('off','Sin conexión');console.error(e)}
+  if(wait)checkWait();
+}
+function qrSvg(text){
+  try{const q=qrcode(0,'M');q.addData(text);q.make();return '<div class="qr">'+q.createSvgTag({cellSize:4,margin:0,scalable:true})+'</div>'}
+  catch(e){return ''}
 }
 function render(){
   $('tabs').innerHTML=Object.keys(MENU).map(k=>`<button class="tab" data-s="${k}" aria-pressed="${k===cur}">${MENU[k][0]}</button>`).join('');
-  $('menu').innerHTML=`<b>Menú de hoy</b>${MENU[cur][1]}`;
+  $('menu').innerHTML=`<b>Menú de hoy</b>${MENU[cur][1]}<div class="n">🌱 Vegano: ${MENU[cur][2]}</div>`;
   const list=turnos.filter(t=>t.servicio===cur);
-  if(sel&&!list.some(t=>t.hora===sel&&t.disponibles>0))sel=null;
+  if(sel&&!list.some(t=>t.hora===sel))sel=null;
   $('turnos').innerHTML=list.length?list.map(t=>{
-    const p=t.disponibles/t.capacidad,col=t.disponibles===0?'var(--bad)':p<.2?'var(--warn)':'var(--ok)';
-    return `<button class="t" data-h="${t.hora}" ${t.disponibles===0?'disabled':''} aria-pressed="${sel===t.hora}"><div class="h">${t.hora}</div><div class="bar"><i style="width:${Math.max(3,p*100)}%;background:${col}"></i></div><div class="n">${t.disponibles===0?'Agotado':t.disponibles+' de '+t.capacidad+' disponibles'}</div></button>`}).join(''):'<span class="n">No hay turnos.</span>';
+    const p=t.disponibles/t.capacidad,full=t.disponibles===0,col=full?'var(--bad)':p<.2?'var(--warn)':'var(--ok)',we=espera(t.servicio,t.hora);
+    return `<button class="t${full?' full':''}" data-h="${t.hora}" aria-pressed="${sel===t.hora}"><div class="h">${t.hora}</div><div class="bar"><i style="width:${Math.max(3,p*100)}%;background:${col}"></i></div><div class="n">${full?`Agotado · ${we} en espera`:t.disponibles+' de '+t.capacidad+' disponibles'}</div></button>`}).join(''):'<span class="n">No hay turnos.</span>';
+  const st=turnos.find(t=>t.servicio===cur&&t.hora===sel);
+  $('res').textContent=st&&st.disponibles===0?`Unirme a la lista de espera (${sel})`:'Reservar ración';
+  document.querySelectorAll('#menus .tab').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===menuSel));
   $('mi').hidden=!mine;
-  if(mine)$('ticket').innerHTML=`<div class="n">${MENU[mine.s][0]} · ${mine.h}</div><div class="c">${esc(mine.k)}</div><div>${esc(mine.nom)} · ${esc(mine.cod)}</div><div class="n">Llega 10 min antes con tu carné.</div>`;
+  if(mine)$('ticket').innerHTML=`<div class="n">${MENU[mine.s][0]} · ${mine.h} · ${mine.m==='vegano'?'🌱 vegano':'menú regular'}</div>${qrSvg(mine.k+'|'+mine.cod+'|'+mine.s+'|'+mine.h)}<div class="c">${esc(mine.k)}</div><div>${esc(mine.nom)} · ${esc(mine.cod)}</div><div class="n">Muestra este QR con tu carné al llegar.</div>`;
+  $('espera').hidden=!wait;
+  renderPanel();
+}
+function renderPanel(){
+  if(!resu.length){$('kpis').innerHTML='<span class="n">Sin datos todavía.</span>';return}
+  const sum=k=>resu.reduce((a,r)=>a+Number(r[k]),0);
+  const res=sum('reservadas'),cap=sum('capacidad'),esp=sum('en_espera'),veg=sum('veganos');
+  $('kpis').innerHTML=`<div class="kpi"><b>${res}</b><span class="n">raciones reservadas</span></div><div class="kpi"><b>${Math.round(res/cap*100)}%</b><span class="n">de ocupación</span></div><div class="kpi"><b>${esp}</b><span class="n">estudiantes sin ración (en espera)</span></div><div class="kpi"><b>${veg}</b><span class="n">menús veganos</span></div>`;
+  $('tabla').tBodies[0].innerHTML=resu.map(r=>`<tr><td>${MENU[r.servicio]?MENU[r.servicio][0]:esc(r.servicio)} ${esc(r.hora)}</td><td>${r.reservadas}</td><td>${r.capacidad}</td><td>${r.en_espera}</td><td>${r.veganos}</td></tr>`).join('');
+}
+async function checkWait(){
+  const{data,error}=await db.rpc('estado_espera',{p_token:wait.t});
+  if(error)return;
+  if(data.estado==='esperando'){
+    $('waitbox').innerHTML=`<div class="n">${MENU[data.servicio][0]} · turno ${esc(data.hora)}</div><div class="p">#${data.posicion}</div><div>Tu lugar en la lista de espera.</div><div class="n">Si alguien libera su ración, pasa a ti automáticamente y aquí aparecerá tu ticket.</div>`;
+  }else if(data.estado==='asignada'){
+    mine={s:data.servicio,h:data.hora,cod:wait.cod,nom:wait.nom,k:data.codigo,m:data.menu};wait=null;save();render();
+    $('resmsg').className='msg okc';$('resmsg').textContent='🎉 ¡Se liberó una ración y ahora es tuya! Tu ticket ya está listo.';
+  }else{wait=null;save();render()}
 }
 document.addEventListener('click',e=>{
-  const a=e.target.closest('.tab');if(a){cur=a.dataset.s;sel=null;render()}
-  const b=e.target.closest('.t');if(b&&!b.disabled){sel=b.dataset.h;render()}
+  const a=e.target.closest('#tabs .tab');if(a){cur=a.dataset.s;sel=null;render()}
+  const m=e.target.closest('#menus .tab');if(m){menuSel=m.dataset.m;render()}
+  const b=e.target.closest('.t');if(b){sel=b.dataset.h;render()}
 });
 $('sug').onclick=()=>{
-  const v=$('salida').value;if(!v){$('sugmsg').textContent='Indica tu hora de salida.';return}
-  const lim=mins(v)+15;let f=null;
-  for(const k of ['almuerzo','desayuno']){f=turnos.find(t=>t.servicio===k&&mins(t.hora)>=lim&&t.disponibles>0);if(f)break}
-  $('sugmsg').className='msg '+(f?'okc':'err');
-  if(f){cur=f.servicio;sel=f.hora;render();$('sugmsg').textContent=`Te recomendamos el turno de ${f.hora} (${MENU[f.servicio][0].slice(2)}): quedan ${f.disponibles} cupos. Ya lo seleccionamos para ti.`}
-  else $('sugmsg').textContent='No hay turnos disponibles después de esa hora.';
+  const s=$('salida').value,v=$('vuelta').value,msg=$('sugmsg');
+  if(!s){msg.className='msg err';msg.textContent='Indica a qué hora sales de clase.';return}
+  const ini=mins(s)+10,fin=v?mins(v)-30:24*60;
+  if(v&&fin<ini){msg.className='msg err';msg.textContent='No te alcanza el tiempo: necesitas al menos 40 minutos entre clases (10 para llegar y 30 para comer).';return}
+  const libres=turnos.filter(t=>mins(t.hora)>=ini&&mins(t.hora)<=fin).sort((a,b)=>mins(a.hora)-mins(b.hora));
+  const f=libres.find(t=>t.disponibles>0);
+  if(f){cur=f.servicio;sel=f.hora;render();msg.className='msg okc';
+    msg.textContent=`Te recomendamos el turno de ${f.hora} (${MENU[f.servicio][0].slice(2)}): llegas a tiempo, comes y vuelves a clase${v?' a las '+v:''}. Quedan ${f.disponibles} cupos. Ya lo seleccionamos para ti.`;
+    $('confirmar').scrollIntoView({behavior:'smooth',block:'start'})}
+  else if(libres.length){const g=libres[0];cur=g.servicio;sel=g.hora;render();msg.className='msg err';
+    msg.textContent=`Los turnos entre ${fmt(ini)} y ${fmt(fin)} están llenos. Seleccionamos el de ${g.hora}: puedes unirte a su lista de espera (${espera(g.servicio,g.hora)} personas antes que tú).`}
+  else{msg.className='msg err';msg.textContent=`No hay turnos entre ${fmt(ini)} y ${fmt(fin)}.`}
 };
 $('res').onclick=async()=>{
   const m=$('resmsg'),cod=$('cod').value.trim(),nom=$('nom').value.trim();m.className='msg err';
-  if(mine){m.textContent='Ya tienes una reserva activa. Cancélala para hacer otra.';return}
+  if(mine){m.textContent='Ya tienes una reserva activa. Libérala para hacer otra.';return}
+  if(wait){m.textContent='Ya estás en una lista de espera. Sal de ella para elegir otro turno.';return}
   if(!sel){m.textContent='Elige primero un turno.';return}
   if(!/^\d{8}$/.test(cod)){m.textContent='El código de matrícula debe tener 8 dígitos.';return}
   if(nom.length<3){m.textContent='Escribe tu nombre completo.';return}
-  const btn=$('res');btn.disabled=true;m.className='msg';m.textContent='Reservando…';
-  const{data,error}=await db.rpc('reservar',{p_servicio:cur,p_hora:sel,p_matricula:cod,p_nombre:nom});
+  const st=turnos.find(t=>t.servicio===cur&&t.hora===sel),full=st&&st.disponibles===0;
+  const btn=$('res');btn.disabled=true;m.className='msg';m.textContent=full?'Uniéndote a la lista…':'Reservando…';
+  const args={p_servicio:cur,p_hora:sel,p_matricula:cod,p_nombre:nom,p_menu:menuSel};
+  const{data,error}=await db.rpc(full?'unirse_espera':'reservar',args);
   btn.disabled=false;
   if(error){m.className='msg err';m.textContent=error.message;load();return}
-  mine={s:cur,h:sel,cod,nom,k:data};saveMine();
-  m.className='msg okc';m.textContent='¡Reserva confirmada! Guarda tu código.';sel=null;load();
+  if(full){wait={t:data.token,cod,nom};m.className='msg okc';m.textContent=`Estás en la lista de espera: puesto #${data.posicion}.`}
+  else{mine={s:cur,h:sel,cod,nom,k:data,m:menuSel};m.className='msg okc';m.textContent='¡Reserva confirmada! Guarda tu QR.'}
+  save();sel=null;load();
 };
 $('cancel').onclick=async()=>{
-  const{error}=await db.rpc('cancelar',{p_codigo:mine.k});
+  const{data,error}=await db.rpc('cancelar',{p_codigo:mine.k});
   if(error){$('resmsg').className='msg err';$('resmsg').textContent=error.message;return}
-  mine=null;saveMine();
-  $('resmsg').className='msg';$('resmsg').textContent='Reserva cancelada. El cupo quedó libre para otro estudiante.';load();
+  mine=null;save();
+  $('resmsg').className='msg okc';$('resmsg').textContent=data==='reasignada'?'Ración liberada: se asignó automáticamente al primer estudiante de la lista de espera. ¡Gracias!':'Reserva cancelada. El cupo quedó libre para otro estudiante.';load();
+};
+$('salir').onclick=async()=>{
+  await db.rpc('salir_espera',{p_token:wait.t});wait=null;save();
+  $('resmsg').className='msg';$('resmsg').textContent='Saliste de la lista de espera.';load();
 };
 try{
   db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
