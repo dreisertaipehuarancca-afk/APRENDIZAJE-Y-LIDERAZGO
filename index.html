@@ -4,7 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Comedor Universitario UNMSM · Reserva de raciones</title>
+<meta name="description" content="Reserva tu ración del comedor universitario y recógela mostrando tu código QR en la entrada.">
+<meta name="theme-color" content="#6e1423">
+<link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="escudo-unmsm.png">
+<link rel="apple-touch-icon" href="icono-192.png">
+<link rel="preload" as="image" href="escudo-unmsm.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
@@ -22,8 +27,6 @@ header .wrap{display:flex;align-items:center;justify-content:space-between;gap:1
 nav{display:flex;gap:4px}
 nav a{color:var(--mut);text-decoration:none;padding:8px 12px;border-radius:6px;font-weight:600;font-size:.95rem}
 nav a[aria-current="page"]{color:var(--pri);background:var(--pri-soft)}
-.tag{font-size:.75rem;color:var(--mut);border:1px solid var(--line);border-radius:4px;padding:1px 6px;margin-left:8px;font-weight:600;vertical-align:2px;white-space:nowrap}
-@media(max-width:600px){.tag{display:table;margin:2px 0}.brand img{height:44px}}
 main{padding-top:28px;padding-bottom:48px}
 h1{font-size:1.75rem;line-height:1.2;margin:0 0 6px}
 h2{font-size:1.15rem;margin:0 0 14px}
@@ -98,7 +101,7 @@ footer{color:var(--mut);font-size:.85rem;text-align:center;padding:0 20px 28px;m
 </head>
 <body>
 <header><div class="wrap">
-<div class="brand"><img src="escudo-unmsm.png" alt="Escudo de la Universidad Nacional Mayor de San Marcos"><div><b>Comedor Universitario<span class="tag">Prototipo académico · no oficial</span></b><span>Universidad Nacional Mayor de San Marcos · Ciudad Universitaria</span></div></div>
+<div class="brand"><img src="escudo-unmsm.png" width="45" height="52" alt="Escudo de la Universidad Nacional Mayor de San Marcos"><div><b>Comedor Universitario</b><span>Universidad Nacional Mayor de San Marcos · Ciudad Universitaria</span></div></div>
 <nav><a href="#" id="nav-res">Reservar</a><a href="#comedor" id="nav-com">Control de ingreso</a></nav>
 </div></header>
 
@@ -169,11 +172,10 @@ footer{color:var(--mut);font-size:.85rem;text-align:center;padding:0 20px 28px;m
 <div class="stats" id="stats"></div>
 </div>
 </main>
-<footer>Prototipo académico del Grupo 1 · Aprendizaje Estratégico y Liderazgo · No es un servicio oficial de la universidad.</footer>
+<footer>Propuesta de sistema de reservas elaborada por el Grupo 1 · Aprendizaje Estratégico y Liderazgo. No es un servicio oficial de la UNMSM.</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.58.0/dist/umd/supabase.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 <script>
 {
 const SUPABASE_URL='https://oefboaaaqjqrotrloxyf.supabase.co';
@@ -189,7 +191,7 @@ let db=null,svc=[],cur='almuerzo',mine=null,wait=null;
 try{mine=JSON.parse(localStorage.getItem('cu_res')||'null');wait=JSON.parse(localStorage.getItem('cu_wait')||'null')}catch(e){}
 if(mine&&mine.f<hoy())mine=null;
 function save(){try{mine?localStorage.setItem('cu_res',JSON.stringify(mine)):localStorage.removeItem('cu_res');wait?localStorage.setItem('cu_wait',JSON.stringify(wait)):localStorage.removeItem('cu_wait')}catch(e){}}
-function conn(on){for(const[d,t]of[['dot','stt'],['dot2','stt2']]){$(d).className='dot '+(on?'on':'off');$(t).textContent=on?'Disponibilidad en vivo':'Sin conexión'}}
+function conn(on){for(const[d,t]of[['dot','stt'],['dot2','stt2']]){$(d).className='dot '+(on?'on':'off');$(t).textContent=on?'Disponibilidad en vivo':mine?'Sin conexión · tu código QR sigue siendo válido':'Sin conexión'}}
 function say(t,c){const m=$('msg');m.className='msg '+(c||'');m.textContent=t}
 
 async function load(){
@@ -279,6 +281,7 @@ $('camon').onclick=async()=>{
   catch(e){$('camtxt').textContent='No se pudo abrir la cámara. Usa el ingreso manual.';return}
   const v=$('video');v.srcObject=stream;await v.play();v.hidden=false;$('frame').hidden=false;$('camtxt').hidden=true;$('camon').textContent='Apagar lector';
   const det='BarcodeDetector'in window?new BarcodeDetector({formats:['qr_code']}):null;
+  if(!det&&!window.jsQR)await new Promise(ok=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js';s.onload=s.onerror=ok;document.head.appendChild(s)});
   const cv=document.createElement('canvas'),cx=cv.getContext('2d',{willReadFrequently:true});
   const tick=async()=>{
     if(!stream)return;
@@ -300,6 +303,7 @@ function route(){
   renderStats();
 }
 addEventListener('hashchange',route);route();
+if('serviceWorker'in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 try{db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);load();setInterval(load,10000)}
 catch(e){conn(false);console.error(e)}
 }

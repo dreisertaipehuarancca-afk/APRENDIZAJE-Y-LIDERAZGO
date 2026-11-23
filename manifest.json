@@ -1,0 +1,14 @@
+{
+  "name": "Comedor Universitario · Reserva de raciones",
+  "short_name": "Comedor",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f3f4f6",
+  "theme_color": "#6e1423",
+  "lang": "es-PE",
+  "icons": [
+    {"src": "icono-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "icono-512.png", "sizes": "512x512", "type": "image/png"}
+  ]
+}
